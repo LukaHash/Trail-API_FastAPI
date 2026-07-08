@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Depends
 
-from app.models import create_db_and_tables, get_async_session, User
+from app.models import create_db_and_tables, get_async_session, User, Route
 from app.schemas import RouteCreate, UserCreate
 from  sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,16 +13,18 @@ app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/routes")
-def get_route_data(route: RouteCreate):
-    new_route = {
-        "title": route.title,
-        "distance_km": route.distance_km,
-        "time_minutes": route.time_minutes,
-        "route_type": route.route_type
-
-    }
+async def get_route_data(route: RouteCreate, session: AsyncSession = Depends(get_async_session)):
+    new_route = Route(
+        title= route.title,
+        distance_km = route.distance_km,
+        time_minutes= route.time_minutes,
+        route_type= route.route_type,
+        user_id= route.user_id
+    )
+    session.add(new_route)
+    await session.commit()
+    await session.refresh(new_route)
     return new_route
-
 
 
 @app.post("/users")

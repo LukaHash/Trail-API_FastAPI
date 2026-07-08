@@ -5,7 +5,7 @@ from pydantic import BaseModel
 class RouteCreate(BaseModel):
     title: str
     distance_km: float
-    time_minutes: int
+    time_minutes: float
     route_type: str
     user_id: int
 
