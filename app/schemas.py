@@ -15,4 +15,3 @@ class UserCreate(BaseModel):
     level: str
 
 
-

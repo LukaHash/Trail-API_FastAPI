@@ -50,10 +50,6 @@ async def user_create(user: UserCreate, session: AsyncSession = Depends(get_asyn
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
-
-
-
 @app.get("/users/{user_id}/stats")
 async def get_user_profile(user_id: int, session: AsyncSession = Depends(get_async_session)):
     if not await session.execute(select(Route).where(Route.user_id == user_id)):
@@ -79,5 +75,3 @@ async def get_user_profile(user_id: int, session: AsyncSession = Depends(get_asy
     }
 
     return summary
-
-
