@@ -1,6 +1,6 @@
 
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Depends
-
+from app.tg import send_tg_notifications
 from app.models import create_db_and_tables, get_async_session, User, Route
 from app.schemas import RouteCreate, UserCreate
 from  sqlalchemy.ext.asyncio import AsyncSession
@@ -45,6 +45,7 @@ async def user_create(user: UserCreate, session: AsyncSession = Depends(get_asyn
         session.add(new_user)
         await session.commit()
         await session.refresh(new_user)
+        send_tg_notifications(f"new user was added to db: {new_user.username}\n level:{new_user.level}")
         return new_user
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -7,9 +7,11 @@ test.db
 __pycache__/
 *.pyc
 
+/app/tg.py
 
 venv/
 env/.env
+
 
 
 test/
