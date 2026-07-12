@@ -53,7 +53,8 @@ async def user_create(user: UserCreate, session: AsyncSession = Depends(get_asyn
 
 @app.get("/users/{user_id}/stats")
 async def get_user_profile(user_id: int, session: AsyncSession = Depends(get_async_session)):
-    if not await session.execute(select(Route).where(Route.user_id == user_id)):
+    user = await session.get(User,user_id)
+    if user is None:
         raise HTTPException(status_code=404, detail=f"can't find any user with id: {user_id}")
 
     total_distance = 0.0
