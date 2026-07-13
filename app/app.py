@@ -1,4 +1,4 @@
-
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Depends
 from app.tg import send_tg_notifications
 from app.models import create_db_and_tables, get_async_session, User, Route
@@ -7,10 +7,23 @@ from  sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 
+
 async def lifespan(app: FastAPI):
     await create_db_and_tables()
-    yield
+    scheduler = AsyncIOScheduler()
 
+    scheduler.add_job(
+        func=report_tg,
+        trigger="interval",
+        seconds=10,
+        replace_existing=True,
+        max_instances=1
+    )
+
+
+    scheduler.start()
+    yield
+    scheduler.shutdown()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -77,3 +90,6 @@ async def get_user_profile(user_id: int, session: AsyncSession = Depends(get_asy
     }
 
     return summary
+
+def report_tg():
+    return send_tg_notifications("Бот работает, все в норме")
