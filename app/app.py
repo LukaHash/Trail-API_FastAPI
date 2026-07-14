@@ -58,7 +58,7 @@ async def user_create(user: UserCreate, session: AsyncSession = Depends(get_asyn
         session.add(new_user)
         await session.commit()
         await session.refresh(new_user)
-        send_tg_notifications(f"new user was added to db: {new_user.username}\n level:{new_user.level}")
+        await send_tg_notifications(f"new user was added to db: {new_user.username}\n level:{new_user.level}")
         return new_user
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -74,8 +74,6 @@ async def get_user_profile(user_id: int, session: AsyncSession = Depends(get_asy
     total_time = 0.0
     count = 0
     result = await session.execute(select(Route).where(Route.user_id == user_id))
-    if not result:
-        raise HTTPException(status_code=404, detail=f"can't find any routes for user with id: {user_id}")
     routes = result.scalars().all()
 
 
@@ -88,8 +86,10 @@ async def get_user_profile(user_id: int, session: AsyncSession = Depends(get_asy
         "total_time": total_time,
         "routes completed": count
     }
-
+    if summary["routes completed"] == 0:
+        raise HTTPException(status_code=404, detail=f"can't find any routes for user with id: {user_id}")
     return summary
 
-def report_tg():
-    return send_tg_notifications("Бот работает, все в норме")
+async def report_tg():
+    await send_tg_notifications("Бот работает, все в норме")
+    return "Func ends correctly"
