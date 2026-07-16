@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(
         func=report_tg,
         trigger="interval",
-        seconds=10,
+        minutes=10,
         replace_existing=True,
         max_instances=1
     )
@@ -91,5 +91,8 @@ async def get_user_profile(user_id: int, session: AsyncSession = Depends(get_asy
     return summary
 
 async def report_tg():
-    await send_tg_notifications("Бот работает, все в норме")
-    return "Func ends correctly"
+    async for session in get_async_session():
+        result = await session.scalars(select(User))
+        print(dir(result))
+        await send_tg_notifications(f"Бот работает, кол-во бегунов в бд: {len(result.all())}")
+        return "Func ends correctly"
