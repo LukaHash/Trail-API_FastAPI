@@ -10,7 +10,9 @@ TG_CHAT_ID = getenv("TG_CHAT_ID")
 
 async def send_tg_notifications(text: str):
     if not TG_CHAT_ID:
-        raise ValueError("TG_CHAT_ID is empty!")
+        # raise ValueError("TG_CHAT_ID is empty!")
+        print("TG_CHAT_ID is empty!")
+        pass
     url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
     data =  {
         "chat_id": TG_CHAT_ID,
