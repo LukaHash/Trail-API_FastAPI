@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+
+  web:
+    # Вместо образа с DockerHub мы говорим чтобы он собрал образ из папки где лежит Dokerfile
+    build: .
+    # Пробрасываем порты из контейнера на наш пк
+    #Слева порт на моем компьютере. Справа порт внутри контейнера upd: В host режиме игнорируются
+    ports:
+      - "8000:8000"
+    # Пишем что web зависит от db -- значит сначала запускается db и уже потом web
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: traildb
+    ports:
+      - "5432:5432"
+      # pg_isready - это встроенная утилита Postgres, которая проверяет, принимает ли база соединения
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U myuser -d traildb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5 # тут чисто старая версия
+
+
